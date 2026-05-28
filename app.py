@@ -3,7 +3,7 @@ import streamlit as st
 from google import genai
 from google.genai import types
 
-# 1. Configuración de la interfaz (Estilo minimalista similar a tu CSS original)
+# 1. Configuración de la interfaz (Estilo minimalista)
 st.set_page_config(
     page_title="Shopee Ads Generator PRO",
     page_icon="🛍️",
@@ -33,7 +33,7 @@ st.title("🛍️ Shopee Ads Generator PRO")
 
 # 2. Inicialización de la API de Gemini de forma segura
 try:
-    # Streamlit buscará esta variable en tu archivo secrets.toml local
+    # Streamlit buscará esta variable en tus Secrets de la nube
     api_key = st.secrets["GEMINI_API_KEY"]
     client = genai.Client(api_key=api_key)
 except KeyError:
@@ -55,7 +55,7 @@ with col2:
 # Mapeo de idioma para el prompt
 lang_text = "português do Brasil" if "🇧🇷" in language else "espanhol"
 
-# Función auxiliar para extraer las secciones usando Regex (idéntica a tu función 'extract' de JS)
+# Función auxiliar para extraer las secciones usando Regex
 def extract_section(text, key):
     pattern = rf"{key}(.*?)(?=TÍTULO:|COPY:|CTA:|HASHTAGS:|$)"
     match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
@@ -67,7 +67,7 @@ if st.button("Gerar anúncio", type="primary"):
         st.warning("Por favor, informe o nome do produto.")
     else:
         with st.spinner("Gerando anúncio com o Gemini..."):
-            # Recreamos exactamente tu prompt original
+            # Prompt de generación comercial
             prompt = f"""
 Crie conteúdo para Shopee em {lang_text} com tom {tone.lower()}:
 
@@ -83,16 +83,16 @@ CTA:
 HASHTAGS:
 """
             try:
-                # Usamos el modelo recomendado actual (gemini-1.5-flash)
+                # CORRECCIÓN: Usamos el modelo estándar actual gemini-2.5-flash
                 response = client.models.generate_content(
-                    model='gemini-1.5-flash',
+                    model='gemini-2.5-flash',
                     contents=prompt,
                     config=types.GenerateContentConfig(
                         temperature=0.7
                     )
                 )
                 
-                # Guardamos el resultado completo en la sesión para mantenerlo tras interactuar con la página
+                # Guardamos el resultado completo en la sesión
                 st.session_state['last_result'] = response.text
                 
             except Exception as e:
@@ -102,7 +102,7 @@ HASHTAGS:
 if 'last_result' in st.session_state:
     text_result = st.session_state['last_result']
     
-    # Extraemos las secciones usando nuestra función regex de Python (CORREGIDO)
+    # Extraemos las secciones usando nuestra función regex
     titulo = extract_section(text_result, "TÍTULO:")
     copy = extract_section(text_result, "COPY:")
     cta = extract_section(text_result, "CTA:")
@@ -118,7 +118,7 @@ if 'last_result' in st.session_state:
         "Hashtags": hashtags
     }
     
-    # Renderizado en cajas individuales con botón de copia nativo
+    # Renderizado en cajas individuales con botón de copia nativo de Streamlit
     for label, content in sections_dict.items():
         if content:
             st.markdown(f"""
@@ -126,13 +126,13 @@ if 'last_result' in st.session_state:
                 <div class="box-label">{label}</div>
             </div>
             """, unsafe_allow_html=True)
-            # El componente code de Streamlit incluye un botón nativo de "Copiar al portapapeles" en la esquina superior derecha
+            # El componente code incluye el botón de "Copiar" automático en la esquina
             st.code(content, language=None)
             st.markdown("<br>", unsafe_allow_html=True)
             
     st.markdown("---")
     
-    # Botón para exportar a TXT (reemplaza tu función exportTXT en JS)
+    # Botón para exportar todo a un archivo de texto plano
     st.download_button(
         label="⬇️ Exportar TXT",
         data=text_result,
