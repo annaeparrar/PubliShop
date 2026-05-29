@@ -58,13 +58,13 @@ def extract_section(text, header):
     match = re.search(pattern, text, re.IGNORECASE)
     return match.group(1).strip() if match else ""
 
-# 4. Inicialização Segura e Híbrida da API Key (Compatível com Local e Streamlit Cloud)
+# 4. Inicialização Segura e Híbrida da API Key (Mapeia local e nuvem automaticamente)
 api_key = None
 
 if "GEMINI_API_KEY" in st.secrets:
     api_key = st.secrets["GEMINI_API_KEY"]
 else:
-    # Fallback usando o módulo 'os' correto para ambiente local / Codespaces
+    # Correção do st.environ utilizando a biblioteca integrada 'os'
     api_key = os.environ.get("GEMINI_API_KEY", None)
 
 if not api_key:
@@ -72,13 +72,13 @@ if not api_key:
     st.stop()
 
 try:
-    # Inicialização oficial do cliente genai
+    # Inicialização oficial do SDK moderno da Google
     client = genai.Client(api_key=api_key)
 except Exception as e:
     st.error(f"❌ Erro ao inicializar o cliente Gemini: {e}")
     st.stop()
 
-# 5. Interface de Usuário (UI) - Correção total de strings e tags HTML
+# 5. Interface do Usuário (UI) - Textos e strings corrigidos sem quebras
 st.markdown('<div class="main-title">🛍️ Shopee Ads Generator PRO</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Crie anúncios de alta conversão em segundos com Inteligência Artificial.</div>', unsafe_allow_html=True)
 
@@ -92,7 +92,7 @@ with col1:
 with col2:
     language = st.selectbox("Idioma", ["Português do Brasil 🇧🇷", "Español 🇪🇸"])
 
-# 6. Lógica de Geração de Conteúdo com Blocos Completos e Alinhados
+# 6. Lógica de Geração de Conteúdo (Alinhamento rigoroso de blocos try/except)
 if st.button("Gerar anúncio", type="primary", use_container_width=True):
     if not product:
         st.warning("Por favor, insira o nome do produto.")
@@ -106,12 +106,4 @@ if st.button("Gerar anúncio", type="primary", use_container_width=True):
 
             Produto: {product}
             Características: {features}
-            Descrição complementar: {description}
-
-            Retorne a resposta dividida EXATAMENTE com estes cabeçalhos em letras maiúsculas:
-
-            TÍTULO:
-            (Escreva um título atraente e otimizado para buscas)
-
-            COPY:
-            (Desenvolva o corpo do texto do anúncio foc
+            Descrição complementar
