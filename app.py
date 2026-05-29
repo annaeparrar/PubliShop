@@ -58,13 +58,13 @@ def extract_section(text, header):
     match = re.search(pattern, text, re.IGNORECASE)
     return match.group(1).strip() if match else ""
 
-# 4. Inicialização Segura e Híbrida da API Key
+# 4. Inicialização Segura e Híbrida da API Key (Compatível com Local e Streamlit Cloud)
 api_key = None
 
 if "GEMINI_API_KEY" in st.secrets:
     api_key = st.secrets["GEMINI_API_KEY"]
 else:
-    # Fallback seguro usando a biblioteca os integrada do sistema
+    # Fallback usando o módulo 'os' correto para ambiente local / Codespaces
     api_key = os.environ.get("GEMINI_API_KEY", None)
 
 if not api_key:
@@ -72,13 +72,13 @@ if not api_key:
     st.stop()
 
 try:
-    # Inicialização do cliente oficial usando a chave validada
+    # Inicialização oficial do cliente genai
     client = genai.Client(api_key=api_key)
 except Exception as e:
     st.error(f"❌ Erro ao inicializar o cliente Gemini: {e}")
     st.stop()
 
-# 5. Interfaz de Usuário (UI) - Correção total de strings e tags HTML
+# 5. Interface de Usuário (UI) - Correção total de strings e tags HTML
 st.markdown('<div class="main-title">🛍️ Shopee Ads Generator PRO</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Crie anúncios de alta conversão em segundos com Inteligência Artificial.</div>', unsafe_allow_html=True)
 
@@ -92,7 +92,7 @@ with col1:
 with col2:
     language = st.selectbox("Idioma", ["Português do Brasil 🇧🇷", "Español 🇪🇸"])
 
-# 6. Lógica de Geração de Conteúdo com Try-Except Completo
+# 6. Lógica de Geração de Conteúdo com Blocos Completos e Alinhados
 if st.button("Gerar anúncio", type="primary", use_container_width=True):
     if not product:
         st.warning("Por favor, insira o nome do produto.")
@@ -114,74 +114,4 @@ if st.button("Gerar anúncio", type="primary", use_container_width=True):
             (Escreva um título atraente e otimizado para buscas)
 
             COPY:
-            (Desenvolva o corpo do texto do anúncio focando nos benefícios)
-
-            CTA:
-            (Crie uma chamada para ação persuasiva)
-
-            HASHTAGS:
-            (Insira as hashtags mais relevantes separadas por espaços)
-            """
-            
-            try:
-                # Chamada estável utilizando o modelo atualizado gemini-2.5-flash
-                response = client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=prompt,
-                )
-                
-                generated_text = response.text
-                
-                # Extração e segmentação de blocos
-                titulo = extract_section(generated_text, "TÍTULO")
-                copy = extract_section(generated_text, "COPY")
-                cta = extract_section(generated_text, "CTA")
-                hashtags = extract_section(generated_text, "HASHTAGS")
-                
-                st.markdown("## ✨ Resultados Gerados")
-                
-                st.subheader("📝 Título SEO")
-                st.code(titulo if titulo else generated_text, language=None)
-                
-                if copy:
-                    st.subheader("🎯 Copy do Anúncio")
-                    st.info(copy)
-                if cta:
-                    st.subheader("🚀 Call to Action (CTA)")
-                    st.code(cta, language=None)
-                if hashtags:
-                    st.subheader("🏷️ Hashtags Sugeridas")
-                    st.text(hashtags)
-                
-                # Geração de arquivo para download do usuário
-                full_download = f"TÍTULO:\n{titulo}\n\nCOPY:\n{copy}\n\nCTA:\n{cta}\n\nHASHTAGS:\n{hashtags}"
-                st.download_button(
-                    label="📥 Exportar Anúncio (.txt)",
-                    data=full_download,
-                    file_name=f"{product.replace(' ', '_')}_shopee_ad.txt",
-                    mime="text/plain"
-                )
-                
-            except APIError as e:
-                if e.code == 503:
-                    st.error("⚠️ Os servidores do Gemini estão sob alta demanda temporária. Por favor, aguarde alguns segundos e tente novamente.")
-                elif e.code == 404:
-                    st.error("⚠️ Erro 404: Modelo não encontrado. Verifique a sintaxe da chamada do modelo.")
-                elif e.code == 401:
-                    st.error("⚠️ Erro de Autenticação (401): A API Key configurada parece inválida.")
-                else:
-                    st.error(f"Erro na API do Gemini: {e.message}")
-            except Exception as e:
-                st.error(f"Ocorreu um erro inesperado: {e}")
-
-# 7. Rodapé e Injeção de Link Externo
-st.markdown("---")
-st.markdown("<p style='text-align: center; color: #aaa; font-size: 12px;'>Powered by Gemini AI • Shopee Ads Generator PRO</p>", unsafe_allow_html=True)
-
-st.markdown("""
-    <div class="wise-container">
-        <a href="https://wise.com/pay/r/A03_lpdchRegPpo" target="_blank" rel="noopener noreferrer" class="wise-button">
-            💚 Donar con Wise
-        </a>
-    </div>
-""", unsafe_allow_html=True)
+            (Desenvolva o corpo do texto do anúncio foc
