@@ -116,7 +116,7 @@ if st.button("Gerar anúncio", type="primary", use_container_width=True):
                 
                 st.markdown("## ✨ Resultados Gerados")
                 
-                st.subheader("📝 Título SEO")
+                st.subheader("📝 Título Otimizado para SEO")
                 st.code(titulo if titulo else generated_text, language=None)
                 
                 if copy:
