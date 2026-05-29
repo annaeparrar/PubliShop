@@ -58,13 +58,12 @@ def extract_section(text, header):
     match = re.search(pattern, text, re.IGNORECASE)
     return match.group(1).strip() if match else ""
 
-# 4. Inicialização Segura e Híbrida da API Key (Mapeia local e nuvem automaticamente)
+# 4. Inicialização Segura e Híbrida da API Key
 api_key = None
 
 if "GEMINI_API_KEY" in st.secrets:
     api_key = st.secrets["GEMINI_API_KEY"]
 else:
-    # Correção do st.environ utilizando a biblioteca integrada 'os'
     api_key = os.environ.get("GEMINI_API_KEY", None)
 
 if not api_key:
@@ -72,13 +71,12 @@ if not api_key:
     st.stop()
 
 try:
-    # Inicialização oficial do SDK moderno da Google
     client = genai.Client(api_key=api_key)
 except Exception as e:
     st.error(f"❌ Erro ao inicializar o cliente Gemini: {e}")
     st.stop()
 
-# 5. Interface do Usuário (UI) - Textos e strings corrigidos sem quebras
+# 5. Interface do Usuário (UI)
 st.markdown('<div class="main-title">🛍️ Shopee Ads Generator PRO</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Crie anúncios de alta conversão em segundos com Inteligência Artificial.</div>', unsafe_allow_html=True)
 
@@ -92,7 +90,7 @@ with col1:
 with col2:
     language = st.selectbox("Idioma", ["Português do Brasil 🇧🇷", "Español 🇪🇸"])
 
-# 6. Lógica de Geração de Conteúdo (Alinhamento rigoroso de blocos try/except)
+# 6. Lógica de Geração de Conteúdo
 if st.button("Gerar anúncio", type="primary", use_container_width=True):
     if not product:
         st.warning("Por favor, insira o nome do produto.")
@@ -100,31 +98,10 @@ if st.button("Gerar anúncio", type="primary", use_container_width=True):
         with st.spinner("Gerando conteúdo estratégico..."):
             lang_text = "português do Brasil" if "Português" in language else "espanhol"
             
-            prompt = f"""
-            Crie um anúncio de alta conversão para a plataforma Shopee em {lang_text} com o tom {tone.lower()}.
-            Use técnicas de SEO e gatilhos mentais apropriados.
-
-            Produto: {product}
-            Características: {features}
-            Descrição complementar: {description}
-
-            Retorne a resposta dividida EXATAMENTE com estes cabeçalhos em letras maiúsculas:
-
-            TÍTULO:
-            (Escreva um título atraente e otimizado para buscas)
-
-            COPY:
-            (Desenvolva o corpo do texto do anúncio focando nos benefícios)
-
-            CTA:
-            (Crie uma chamada para ação persuasiva)
-
-            HASHTAGS:
-            (Insira as hashtags mais relevantes separadas por espaços)
-            """
+            # Definindo o prompt de forma explícita e fechando as aspas rigorosamente
+            prompt = f"Crie um anúncio de alta conversão para a plataforma Shopee em {lang_text} com o tom {tone.lower()}. Use técnicas de SEO e gatilhos mentais apropriados. Produto: {product}. Características: {features}. Descrição complementar: {description}. Retorne a resposta dividida EXATAMENTE com estes cabeçalhos em letras maiúsculas: TÍTULO: (Escreva um título atraente) COPY: (Desenvolva o corpo do texto) CTA: (Chamada para ação) HASHTAGS: (Insira as hashtags relevantes separadas por espaços)"
             
             try:
-                # Chamada do modelo estável de produção global
                 response = client.models.generate_content(
                     model='gemini-2.5-flash',
                     contents=prompt,
@@ -132,7 +109,6 @@ if st.button("Gerar anúncio", type="primary", use_container_width=True):
                 
                 generated_text = response.text
                 
-                # Extração segura e segmentada das seções
                 titulo = extract_section(generated_text, "TÍTULO")
                 copy = extract_section(generated_text, "COPY")
                 cta = extract_section(generated_text, "CTA")
@@ -153,7 +129,6 @@ if st.button("Gerar anúncio", type="primary", use_container_width=True):
                     st.subheader("🏷️ Hashtags Sugeridas")
                     st.text(hashtags)
                 
-                # Formatação limpa estruturada para o arquivo de exportação (.txt)
                 full_download = f"TÍTULO:\n{titulo}\n\nCOPY:\n{copy}\n\nCTA:\n{cta}\n\nHASHTAGS:\n{hashtags}"
                 st.download_button(
                     label="📥 Exportar Anúncio (.txt)",
