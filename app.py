@@ -156,7 +156,7 @@ st.markdown("<p style='text-align: center; color: #aaa; font-size: 12px;'>Powere
 st.markdown("""
     <div class="wise-container">
         <a href="https://wise.com/pay/r/A03_lpdchRegPpo" target="_blank" rel="noopener noreferrer" class="wise-button">
-            💚 Donar con Wise
+            💚 Donate
         </a>
     </div>
 """, unsafe_allow_html=True)
