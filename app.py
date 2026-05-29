@@ -11,7 +11,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# 2. Estilos CSS personalizados (Uso correto de unsafe_allow_html=True)
+# 2. Estilos CSS personalizados (Modifica esta sección al inicio de tu app.py)
 st.markdown("""
     <style>
     .main-title {
@@ -36,7 +36,7 @@ st.markdown("""
         color: #163300 !important;
         padding: 14px 24px;
         border-radius: 12px;
-        text-decoration: none;
+        text-decoration: none !important; /* Fuerza la eliminación del subrayado */
         font-family: Arial, sans-serif;
         font-size: 18px;
         font-weight: bold;
@@ -46,8 +46,10 @@ st.markdown("""
         align-items: center;
         gap: 10px;
     }
-    .wise-button:hover {
-        transform: scale(1.05);
+    /* Esta regla elimina el subrayado intrusivo de Streamlit en cualquier estado del enlace */
+    .wise-button:hover, .wise-button:focus, .wise-button:active, .wise-button:visited {
+        text-decoration: none !important;
+        color: #163300 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -155,8 +157,8 @@ st.markdown("<p style='text-align: center; color: #aaa; font-size: 12px;'>Powere
 
 st.markdown("""
     <div class="wise-container">
-        <a href="https://wise.com/pay/r/A03_lpdchRegPpo" target="_blank" rel="noopener noreferrer" class="wise-button" style="text-decoration: none !important; border: none !important;">
-            <span style="text-decoration: none !important;">💚 Donate</span>
+        <a href="https://wise.com/pay/r/A03_lpdchRegPpo" target="_blank" rel="noopener noreferrer" class="wise-button">
+            💚 Donate
         </a>
     </div>
 """, unsafe_allow_html=True)
