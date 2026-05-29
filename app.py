@@ -106,4 +106,82 @@ if st.button("Gerar anúncio", type="primary", use_container_width=True):
 
             Produto: {product}
             Características: {features}
-            Descrição complementar
+            Descrição complementar: {description}
+
+            Retorne a resposta dividida EXATAMENTE com estes cabeçalhos em letras maiúsculas:
+
+            TÍTULO:
+            (Escreva um título atraente e otimizado para buscas)
+
+            COPY:
+            (Desenvolva o corpo do texto do anúncio focando nos benefícios)
+
+            CTA:
+            (Crie uma chamada para ação persuasiva)
+
+            HASHTAGS:
+            (Insira as hashtags mais relevantes separadas por espaços)
+            """
+            
+            try:
+                # Chamada do modelo estável de produção global
+                response = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=prompt,
+                )
+                
+                generated_text = response.text
+                
+                # Extração segura e segmentada das seções
+                titulo = extract_section(generated_text, "TÍTULO")
+                copy = extract_section(generated_text, "COPY")
+                cta = extract_section(generated_text, "CTA")
+                hashtags = extract_section(generated_text, "HASHTAGS")
+                
+                st.markdown("## ✨ Resultados Gerados")
+                
+                st.subheader("📝 Título SEO")
+                st.code(titulo if titulo else generated_text, language=None)
+                
+                if copy:
+                    st.subheader("🎯 Copy do Anúncio")
+                    st.info(copy)
+                if cta:
+                    st.subheader("🚀 Call to Action (CTA)")
+                    st.code(cta, language=None)
+                if hashtags:
+                    st.subheader("🏷️ Hashtags Sugeridas")
+                    st.text(hashtags)
+                
+                # Formatação limpa estruturada para o arquivo de exportação (.txt)
+                full_download = f"TÍTULO:\n{titulo}\n\nCOPY:\n{copy}\n\nCTA:\n{cta}\n\nHASHTAGS:\n{hashtags}"
+                st.download_button(
+                    label="📥 Exportar Anúncio (.txt)",
+                    data=full_download,
+                    file_name=f"{product.replace(' ', '_')}_shopee_ad.txt",
+                    mime="text/plain"
+                )
+                
+            except APIError as e:
+                if e.code == 503:
+                    st.error("⚠️ Os servidores do Gemini estão sob alta demanda temporária. Por favor, aguarde alguns segundos e tente novamente.")
+                elif e.code == 404:
+                    st.error("⚠️ Erro 404: Modelo não encontrado. Verifique a sintaxe da chamada de modelos do SDK.")
+                elif e.code == 401:
+                    st.error("⚠️ Erro de Autenticação (401): A API Key configurada parece inválida.")
+                else:
+                    st.error(f"Erro na API do Gemini: {e.message}")
+            except Exception as e:
+                st.error(f"Ocorreu um erro inesperado: {e}")
+
+# 7. Rodapé Estático e Botão de Doação Seguro
+st.markdown("---")
+st.markdown("<p style='text-align: center; color: #aaa; font-size: 12px;'>Powered by Gemini AI • Shopee Ads Generator PRO</p>", unsafe_allow_html=True)
+
+st.markdown("""
+    <div class="wise-container">
+        <a href="https://wise.com/pay/r/A03_lpdchRegPpo" target="_blank" rel="noopener noreferrer" class="wise-button">
+            💚 Donar con Wise
+        </a>
+    </div>
+""", unsafe_allow_html=True)
